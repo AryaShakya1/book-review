@@ -19,3 +19,10 @@ class BookService:
         if not book:
             return None
         return BookSerializer(book).data
+
+    def create_book(self, book_data):
+        serializer = BookSerializer(data=book_data)
+        if serializer.is_valid():
+            serializer.save()
+            return serializer.data, None
+        return None, serializer.errors
