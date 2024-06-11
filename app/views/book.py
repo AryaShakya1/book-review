@@ -57,9 +57,9 @@ class BookView(APIView):
                 .get_response()
             )
         except Exception as e:
-            print(f"BookView get :: exception:: {e}")
+            print(f"BookView post :: exception:: {e}")
             return (
-                response_builder.result_object({"message": "Unable to get books"})
+                response_builder.result_object({"message": "Unable to create book"})
                 .fail()
                 .internal_error_500()
                 .message("Internal Error")
