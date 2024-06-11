@@ -11,4 +11,21 @@ class Book(BaseModel):
 
     def __str__(self):
         return f"{self.title} - {self.author}"
-    
+
+    @classmethod
+    def get_all_books(cls):
+        return cls.objects.all()
+
+    @classmethod
+    def get_book_by_id(cls, id):
+        try:
+            return cls.objects.get(idx=id, is_deleted=False)
+        except cls.DoesNotExist:
+            return None
+
+    @classmethod
+    def get_book_by_title(cls, title):
+        try:
+            return cls.objects.get(title=title, is_deleted=False)
+        except cls.DoesNotExist:
+            return None
