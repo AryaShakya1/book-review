@@ -14,7 +14,7 @@ class BookService:
             return None
         return BookSerializer(book).data
 
-    def get_book_by_id(self, title):
+    def get_book_by_title(self, title):
         book = Book.get_book_by_title(title=title)
         if not book:
             return None
