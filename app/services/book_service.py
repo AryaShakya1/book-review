@@ -26,3 +26,18 @@ class BookService:
             serializer.save()
             return serializer.data, None
         return None, serializer.errors
+
+    def update_book(self, book_id, data):
+        book = Book.get_book_by_id(id=book_id)
+        serializer = BookSerializer(book, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return serializer.data, None
+        return None, serializer.errors
+
+    def delete_book(self, book_id):
+        book = Book.get_book_by_id(id=book_id)
+        if not book:
+            return False
+        book.delete()
+        return True
