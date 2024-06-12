@@ -65,3 +65,61 @@ class BookView(APIView):
                 .message("Internal Error")
                 .get_response()
             )
+
+
+class BookUpdateDeleteView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, book_id):
+        response_builder = ResponseBuilder()
+        try:
+            book_service = BookService()
+            book_data = request.data
+            book, errors = book_service.update_book(book_id, book_data)
+            if book:
+                return (
+                    response_builder.result_object(book)
+                    .success()
+                    .ok_200()
+                    .get_response()
+                )
+            return (
+                response_builder.result_object({"message": errors})
+                .fail()
+                .bad_request_400()
+                .message("Bad Request")
+                .get_response()
+            )
+        except Exception as e:
+            print(f"BookUpdateDeleteView put :: exception:: {e}")
+            return (
+                response_builder.result_object({"message": "Unable to update book"})
+                .fail()
+                .internal_error_500()
+                .message("Internal Error")
+                .get_response()
+            )
+
+    def delete(self, request, book_id):
+        response_builder = ResponseBuilder()
+        try:
+            book_service = BookService()
+            success = book_service.delete_book(book_id)
+            if success:
+                return response_builder.success().ok_200().get_response()
+            return (
+                response_builder.fail()
+                .not_found_404()
+                .message("Not Found")
+                .get_response()
+            )
+        except Exception as e:
+            print(f"BookUpdateDeleteView put :: exception:: {e}")
+            return (
+                response_builder.result_object({"message": "Unable to update book"})
+                .fail()
+                .internal_error_500()
+                .message("Internal Error")
+                .get_response()
+            )
