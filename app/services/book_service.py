@@ -1,5 +1,6 @@
 from app.models.book import Book
 from app.serializers.book_serializer import BookSerializer
+from django.core.exceptions import PermissionDenied
 
 
 class BookService:
@@ -27,16 +28,24 @@ class BookService:
             return serializer.data, None
         return None, serializer.errors
 
-    def update_book(self, book_id, data):
+    def update_book(self, book_id, data, user):
         book = Book.get_book_by_id(id=book_id)
+        if not book:
+            return None, "Book not Found"
+        if book.created_by != user:
+            raise PermissionDenied("You do not have permission to edit this book.")
         serializer = BookSerializer(book, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return serializer.data, None
         return None, serializer.errors
 
-    def delete_book(self, book_id):
+    def delete_book(self, book_id, user):
         book = Book.get_book_by_id(id=book_id)
+        if not book:
+            return None, "Book not Found"
+        if book.created_by != user:
+            raise PermissionDenied("You do not have permission to edit this book.")
         if not book:
             return False
         book.delete()
