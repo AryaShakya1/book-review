@@ -17,3 +17,10 @@ class Review(BaseModel):
     @classmethod
     def get_all_reviews(cls):
         return cls.objects.all()
+
+    @classmethod
+    def get_review_by_id(cls, id):
+        try:
+            return cls.objects.get(idx=id, is_deleted=False)
+        except cls.DoesNotExist:
+            return None
