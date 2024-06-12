@@ -4,6 +4,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from app.builders.response_builder import ResponseBuilder
 from app.services.book_service import BookService
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from django.core.exceptions import PermissionDenied
 
 
 class BookView(APIView):
@@ -40,7 +41,8 @@ class BookView(APIView):
         response_builder = ResponseBuilder()
         try:
             book_service = BookService()
-            book_data = request.data
+            book_data = request.data.copy()
+            book_data["created_by"] = request.user.id
             book, errors = book_service.create_book(book_data)
             if book:
                 return (
@@ -76,7 +78,7 @@ class BookUpdateDeleteView(APIView):
         try:
             book_service = BookService()
             book_data = request.data
-            book, errors = book_service.update_book(book_id, book_data)
+            book, errors = book_service.update_book(book_id, book_data, request.user)
             if book:
                 return (
                     response_builder.result_object(book)
@@ -89,6 +91,13 @@ class BookUpdateDeleteView(APIView):
                 .fail()
                 .bad_request_400()
                 .message("Bad Request")
+                .get_response()
+            )
+        except PermissionDenied:
+            return (
+                response_builder.fail()
+                .user_forbidden_403()
+                .message("Cannot edit other books")
                 .get_response()
             )
         except Exception as e:
@@ -105,7 +114,7 @@ class BookUpdateDeleteView(APIView):
         response_builder = ResponseBuilder()
         try:
             book_service = BookService()
-            success = book_service.delete_book(book_id)
+            success = book_service.delete_book(book_id, request.user)
             if success:
                 return response_builder.success().ok_200().get_response()
             return (
@@ -114,8 +123,15 @@ class BookUpdateDeleteView(APIView):
                 .message("Not Found")
                 .get_response()
             )
+        except PermissionDenied:
+            return (
+                response_builder.fail()
+                .user_forbidden_403()
+                .message("Cannot delete other books")
+                .get_response()
+            )
         except Exception as e:
-            print(f"BookUpdateDeleteView put :: exception:: {e}")
+            print(f"BookUpdateDeleteView delete :: exception:: {e}")
             return (
                 response_builder.result_object({"message": "Unable to update book"})
                 .fail()

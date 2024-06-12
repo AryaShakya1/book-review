@@ -44,7 +44,6 @@ class ReviewView(APIView):
         try:
             review_service = ReviewService()
             review_data = request.data.copy()
-            print(request.user.id)
             review_data["user"] = request.user.id
             review, errors = review_service.create_review(review_data)
             if review:
