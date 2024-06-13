@@ -22,6 +22,12 @@ class ReviewService:
             return None
         return ReviewSerializer(review).data
 
+    def get_reviews_for_book(self, book_id):
+        reviews = Review.get_review_for_book(book_id=book_id)
+        if not reviews:
+            return None
+        return ReviewSerializer(reviews, many=True).data
+
     def update_review(self, review_id, data, user):
         review = Review.get_review_by_id(id=review_id)
         if not review:
