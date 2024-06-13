@@ -144,3 +144,36 @@ class ReviewUpdateDeleteView(APIView):
                 .message("Internal Error")
                 .get_response()
             )
+
+
+class BookReviewView(APIView):
+
+    def get(self, request, book_id, *args, **kwargs):
+        response_builder = ResponseBuilder()
+        try:
+            review_service = ReviewService()
+            reviews = review_service.get_reviews_for_book(book_id=book_id)
+            if reviews:
+                return (
+                    response_builder.result_object(reviews)
+                    .success()
+                    .ok_200()
+                    .get_response()
+                )
+            return (
+                response_builder.fail()
+                .not_found_404()
+                .message("Not Found")
+                .get_response()
+            )
+        except Exception as e:
+            print(f"BookReviewView get :: exception:: {e}")
+            return (
+                response_builder.result_object(
+                    {"message": "Unable to get book details"}
+                )
+                .fail()
+                .internal_error_500()
+                .message("Internal Error")
+                .get_response()
+            )
