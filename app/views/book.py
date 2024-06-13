@@ -175,3 +175,34 @@ class BookDetailView(APIView):
                 .message("Internal Error")
                 .get_response()
             )
+
+
+class BookSearchView(APIView):
+
+    def get(self, request):
+        response_builder = ResponseBuilder()
+        try:
+            book_service = BookService()
+            books = book_service.search_books(request)
+            if books:
+                return (
+                    response_builder.result_object(books)
+                    .success()
+                    .ok_200()
+                    .get_response()
+                )
+            return (
+                response_builder.fail()
+                .not_found_404()
+                .message("Not Found")
+                .get_response()
+            )
+        except Exception as e:
+            print(f"BookSearchView get :: exception:: {e}")
+            return (
+                response_builder.result_object({"message": "Unable to search for book"})
+                .fail()
+                .internal_error_500()
+                .message("Internal Error")
+                .get_response()
+            )

@@ -1,11 +1,17 @@
 from django.urls import path
-from app.views.book import BookDetailView, BookUpdateDeleteView, BookView
+from app.views.book import (
+    BookDetailView,
+    BookSearchView,
+    BookUpdateDeleteView,
+    BookView,
+)
 from app.views.review import BookReviewView, ReviewUpdateDeleteView, ReviewView
 from app.views.user import login, register
 
 urlpatterns = [
     # books
     path("v1/books/", BookView.as_view(), name="book"),
+    path("v1/books/search/", BookSearchView.as_view(), name="book"),
     path("v1/books/details/", BookDetailView.as_view(), name="book-detail"),
     path(
         "v1/books/<uuid:book_id>/",

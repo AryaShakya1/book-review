@@ -2,6 +2,7 @@ from app.models.book import Book
 from app.serializers.book_serializer import BookDetailSerializer, BookSerializer
 from django.core.exceptions import PermissionDenied
 from rest_framework.pagination import PageNumberPagination
+from django.db.models import Q
 
 
 class BookListPagination(PageNumberPagination):
@@ -51,6 +52,19 @@ class BookService:
             "previous": paginator.get_previous_link(),
         }
         return serializer.data, page_info
+
+    def search_books(self, request):
+        books = Book.get_all_books()
+        title = request.query_params.get("title", None)
+        author = request.query_params.get("author", None)
+        if title:
+            books = books.filter(Q(title__icontains=title))
+            return BookSerializer(books, many=True).data
+        if author:
+            books = books.filter(Q(author__icontains=author))
+            return BookSerializer(books, many=True).data
+
+        return None
 
     def create_book(self, book_data):
         serializer = BookSerializer(data=book_data)
