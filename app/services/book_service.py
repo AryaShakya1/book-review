@@ -36,12 +36,21 @@ class BookService:
             return None
         return BookSerializer(book).data
 
-    def get_all_books_with_reviews(self):
+    def get_all_books_with_reviews(self, request):
         books = Book.objects.prefetch_related("reviews").all()
         if not books:
             return None
-        serializer = BookDetailSerializer(books, many=True)
-        return serializer.data
+        paginator = BookListPagination()
+        paginated_queryset = paginator.paginate_queryset(books, request)
+        serializer = BookDetailSerializer(paginated_queryset, many=True)
+        page_info = {
+            "count": paginator.page.paginator.count,
+            "page": paginator.page.number,
+            "pages": paginator.page.paginator.num_pages,
+            "next": paginator.get_next_link(),
+            "previous": paginator.get_previous_link(),
+        }
+        return serializer.data, page_info
 
     def create_book(self, book_data):
         serializer = BookSerializer(data=book_data)
