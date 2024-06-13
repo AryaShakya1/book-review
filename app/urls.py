@@ -2,7 +2,7 @@ from django.urls import path
 
 from app.views.book import BookUpdateDeleteView, BookView
 from app.views.review import ReviewUpdateDeleteView, ReviewView
-from app.views.user import login
+from app.views.user import login, register
 
 urlpatterns = [
     path("v1/books/", BookView.as_view(), name="book"),
@@ -18,4 +18,5 @@ urlpatterns = [
         name="review-update-delete",
     ),
     path("v1/user/login/", login, name="login"),
+    path("v1/user/register/", register, name="register"),
 ]
