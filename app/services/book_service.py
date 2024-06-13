@@ -1,13 +1,28 @@
 from app.models.book import Book
 from app.serializers.book_serializer import BookDetailSerializer, BookSerializer
 from django.core.exceptions import PermissionDenied
+from rest_framework.pagination import PageNumberPagination
+
+
+class BookListPagination(PageNumberPagination):
+    page_size = 2
 
 
 class BookService:
 
-    def get_all_books(self):
+    def get_all_books(self, request):
         books = Book.get_all_books()
-        return BookSerializer(books, many=True).data
+        paginator = BookListPagination()
+        paginated_queryset = paginator.paginate_queryset(books, request)
+        serializer = BookSerializer(paginated_queryset, many=True)
+        page_info = {
+            "count": paginator.page.paginator.count,
+            "page": paginator.page.number,
+            "pages": paginator.page.paginator.num_pages,
+            "next": paginator.get_next_link(),
+            "previous": paginator.get_previous_link(),
+        }
+        return serializer.data, page_info
 
     def get_book_by_id(self, id):
         book = Book.get_book_by_id(id=id)
