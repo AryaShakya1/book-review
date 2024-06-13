@@ -10,6 +10,7 @@ class Review(BaseModel):
     content = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviews")
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="reviews")
+    rating = models.IntegerField()
 
     def __str__(self):
         return f"{self.content} - {self.book.title} by {self.user}"
