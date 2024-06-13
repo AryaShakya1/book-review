@@ -23,9 +23,12 @@ class BookView(APIView):
         response_builder = ResponseBuilder()
         try:
             book_service = BookService()
-            books = book_service.get_all_books()
+            books, page_info = book_service.get_all_books(request)
             return (
-                response_builder.result_object(books).success().ok_200().get_response()
+                response_builder.result_object(books, page_info)
+                .success()
+                .ok_200()
+                .get_response()
             )
         except Exception as e:
             print(f"BookView get :: exception:: {e}")
@@ -147,7 +150,7 @@ class BookDetailView(APIView):
         response_builder = ResponseBuilder()
         try:
             book_service = BookService()
-            books = book_service.get_all_books_with_reviews()
+            books = book_service.get_all_books_with_reviews(request)
             if books:
                 return (
                     response_builder.result_object(books)
