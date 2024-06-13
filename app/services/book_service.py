@@ -1,5 +1,5 @@
 from app.models.book import Book
-from app.serializers.book_serializer import BookSerializer
+from app.serializers.book_serializer import BookDetailSerializer, BookSerializer
 from django.core.exceptions import PermissionDenied
 
 
@@ -20,6 +20,13 @@ class BookService:
         if not book:
             return None
         return BookSerializer(book).data
+
+    def get_all_books_with_reviews(self):
+        books = Book.objects.prefetch_related("reviews").all()
+        if not books:
+            return None
+        serializer = BookDetailSerializer(books, many=True)
+        return serializer.data
 
     def create_book(self, book_data):
         serializer = BookSerializer(data=book_data)
