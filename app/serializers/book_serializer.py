@@ -20,6 +20,7 @@ class BookSerializer(serializers.ModelSerializer):
 
 class BookDetailSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(many=True, read_only=True)
+    average_rating = serializers.ReadOnlyField()
 
     class Meta:
         model = Book
@@ -30,5 +31,6 @@ class BookDetailSerializer(serializers.ModelSerializer):
             "author",
             "publication_date",
             "created_by",
+            "average_rating",
             "reviews",
         ]
