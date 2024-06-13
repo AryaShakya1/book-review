@@ -1,13 +1,28 @@
 from app.models.review import Review
 from app.serializers.review_serializer import ReviewSerializer
 from django.core.exceptions import PermissionDenied
+from rest_framework.pagination import PageNumberPagination
+
+
+class ReviewListPagination(PageNumberPagination):
+    page_size = 3
 
 
 class ReviewService:
 
-    def get_all_reviews(self):
+    def get_all_reviews(self,request):
         reviews = Review.get_all_reviews()
-        return ReviewSerializer(reviews, many=True).data
+        paginator = ReviewListPagination()
+        paginated_queryset = paginator.paginate_queryset(reviews, request)
+        serializer = ReviewSerializer(paginated_queryset, many=True)
+        page_info = {
+            "count": paginator.page.paginator.count,
+            "page": paginator.page.number,
+            "pages": paginator.page.paginator.num_pages,
+            "next": paginator.get_next_link(),
+            "previous": paginator.get_previous_link(),
+        }
+        return serializer.data, page_info
 
     def create_review(self, review_data):
         serializer = ReviewSerializer(data=review_data)

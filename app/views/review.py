@@ -23,9 +23,9 @@ class ReviewView(APIView):
         response_builder = ResponseBuilder()
         try:
             review_service = ReviewService()
-            reviews = review_service.get_all_reviews()
+            reviews, page_info = review_service.get_all_reviews(request)
             return (
-                response_builder.result_object(reviews)
+                response_builder.result_object(reviews, page_info)
                 .success()
                 .ok_200()
                 .get_response()
