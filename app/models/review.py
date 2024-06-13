@@ -24,3 +24,10 @@ class Review(BaseModel):
             return cls.objects.get(idx=id, is_deleted=False)
         except cls.DoesNotExist:
             return None
+
+    @classmethod
+    def get_review_for_book(cls, book_id):
+        try:
+            return cls.objects.filter(book__idx=book_id)
+        except cls.DoesNotExist:
+            return None
