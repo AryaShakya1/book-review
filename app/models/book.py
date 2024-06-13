@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.db.models import Avg
 from .base import BaseModel
 from django.contrib.auth.models import User
 
@@ -31,3 +31,8 @@ class Book(BaseModel):
             return cls.objects.get(title=title, is_deleted=False)
         except cls.DoesNotExist:
             return None
+
+    @property
+    def average_rating(self):
+        avg_rating = self.reviews.aggregate(Avg("rating"))["rating__avg"]
+        return avg_rating if avg_rating else 0
