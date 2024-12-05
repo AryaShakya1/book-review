@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: aryashakya966/book-review:master
+    container_name: book-review-master
+    command: "gunicorn book_review.wsgi:application --bind 0.0.0.0:8024"
+    restart: on-failure
+    ports:
+      - "8088:8024"
+    env_file:
+      - .env
+    networks:
+      - book-review-net
+
+networks:
+  book-review-net:
+    driver: bridge
