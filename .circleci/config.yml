@@ -1,0 +1,51 @@
+version: 2.1
+
+jobs:
+  build_and_push_on_master:
+    docker:
+      - image: kopilb/aws-docker:v0.1.0
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Image and Push into Docker Hub
+          command: |
+            echo "$ENV" | base64 -d >> /root/project/.env
+            echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+            docker compose -f docker-compose.yml build
+            docker compose -f docker-compose.yml push
+
+  deploy_to_ec2_on_master:
+    machine:
+      enabled: true
+    steps:
+      - checkout
+      - run:
+          name: SSH into EC2, Pull Docker Image and Run
+          command: |
+            sudo apt install sshpass -y 
+            sshpass -p $SSH_PASSWORD scp ./docker-compose.yml $SSH_USER@$SSH_HOST:/home/deployer/ramailo/test-arya/docker-compose.yml
+            echo "$ENV" | base64 -d >> ./.env
+            sshpass -p $SSH_PASSWORD scp ./.env $SSH_USER@$SSH_HOST:/home/deployer/ramailo/test-arya/.env
+            sshpass -p $SSH_PASSWORD ssh $SSH_USER@$SSH_HOST "echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+            cd /home/deployer/ramailo/test-arya
+            docker compose -f ./docker-compose.yml pull
+            docker compose -f ./docker-compose.yml up --no-build --force-recreate -d"
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - build_and_push_on_master:
+          context: ramailo-aws-context
+          filters:
+            branches:
+              only:
+                - master
+      - deploy_to_ec2_on_master:
+          context: ramailo-aws-context
+          requires:
+            - build_and_push_on_master
+          filters:
+            branches:
+              only:
+                - master

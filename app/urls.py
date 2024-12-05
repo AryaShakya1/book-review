@@ -5,11 +5,13 @@ from app.views.book import (
     BookUpdateDeleteView,
     BookView,
 )
+from app.views.health import HealthView
 from app.views.review import BookReviewView, ReviewUpdateDeleteView, ReviewView
 from app.views.user import login, register
 
 urlpatterns = [
     # books
+    path("v1/health/", HealthView.as_view(), name="health"),
     path("v1/books/", BookView.as_view(), name="book"),
     path("v1/books/search/", BookSearchView.as_view(), name="book"),
     path("v1/books/details/", BookDetailView.as_view(), name="book-detail"),
