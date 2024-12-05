@@ -29,9 +29,9 @@ for key, value in config.items():
 SECRET_KEY = "django-insecure-_lj!6gp2f&gv6-*xy3t@t#ecemk&r998obe#cn=3j7@_3a9i@("
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
